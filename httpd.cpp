@@ -57,7 +57,7 @@ char * basicevent(char * data)
         "</u:GetBinaryStateResponse>"
         "</s:Body>"
         "</s:Envelope>",
-        1);
+        Relay1.status());
 
     return basicEventResponse;
 }
