@@ -11,12 +11,16 @@
 #include "version.h"
 #include "led.h"
 #include "httpd.h"
+#include "upnp.h"
+
 
 static void  main_task(void *pvParameters)
 {
     wifi_wait_connection();
 
     xTaskCreate(&httpd_task, "http_server", 1024, NULL, 2, NULL);
+    xTaskCreate(&upnp_task, "upnp_task", 1024, NULL, 5, NULL);
+
 
     while(1) { // keep task running else program crash, we could also use xSemaphore
         task_led_blink(2, 10, 20);
