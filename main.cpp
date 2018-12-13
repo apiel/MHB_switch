@@ -10,9 +10,12 @@
 #include "wifi.h"
 #include "version.h"
 #include "led.h"
+#include "relay.h"
+#include "button.h"
 #include "httpd.h"
 #include "upnp.h"
 
+// need to fix upnp
 
 static void  main_task(void *pvParameters)
 {
@@ -20,7 +23,6 @@ static void  main_task(void *pvParameters)
 
     xTaskCreate(&httpd_task, "http_server", 1024, NULL, 2, NULL);
     xTaskCreate(&upnp_task, "upnp_task", 1024, NULL, 5, NULL);
-
 
     while(1) { // keep task running else program crash, we could also use xSemaphore
         task_led_blink(2, 10, 20);
@@ -39,6 +41,9 @@ extern "C" void user_init(void)
     printf("MyHomeBridge sonoff compile version: %s\n", VERSION);
 
     wifi_new_connection((char *)WIFI_SSID, (char *)WIFI_PASS);
+
+    Button button = Button(sdk_system_restart, [](){ Relay1.toggle(); });
+    button.init();
 
     xTaskCreate(&main_task, "main_task", 1024, NULL, 9, NULL);
 }

@@ -8,12 +8,10 @@
 #include <espressif/esp_common.h>
 
 #include "upnp.h"
-#include "wifi.h"
+// #include "wifi.h"
 
 #define UPNP_MCAST_GRP  ("239.255.255.250")
 #define UPNP_MCAST_PORT (1900)
-
-const char * uid;
 
 static const char* get_my_ip(void)
 {
@@ -137,8 +135,6 @@ void upnp_task(void *pvParameters)
 {
     bool ok = false;
     printf("Upnp task\n\r");
-
-    uid = get_uid();
 
     while (1) {
         if (!ok) ok = upnp_server_init();
