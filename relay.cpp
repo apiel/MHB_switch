@@ -57,7 +57,7 @@ void Relay::toggle()
 
 int Relay::status()
 {
-    printf("-> relay status %d\n", _status);
+    printf("-> relay status: %s\n", _status ? "on" : "off");
     return _status;
 }
 
