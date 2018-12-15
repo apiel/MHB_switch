@@ -6,7 +6,7 @@
 #include "relay.h"
 #include "wifi.h"
 
-char setupResponse[512];
+char setupResponse[1024];
 void upnp_set_setup_response()
 {
     char uid[50];
@@ -18,7 +18,7 @@ void upnp_set_setup_response()
     }
     printf("-> Device unique id for upnp: %s\n", uid);
 
-    sprintf(setupResponse,
+    snprintf(setupResponse, sizeof(setupResponse),
         "HTTP/1.1 200 OK\r\n"
         "Content-type: application/xml\r\n\r\n"
         "<?xml version=\"1.0\"?>"
@@ -60,7 +60,8 @@ char * basicevent(char * data)
         Relay1.setStatus(state);
     }
 
-    sprintf(basicEventResponse, "HTTP/1.1 200 OK\r\n"
+    snprintf(basicEventResponse, sizeof(basicEventResponse),
+        "HTTP/1.1 200 OK\r\n"
         "Content-type: application/xml\r\n\r\n"
         "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
         "<s:Body>"
@@ -77,7 +78,8 @@ char * basicevent(char * data)
 char statusResponse[512];
 char * status()
 {
-    sprintf(statusResponse, "HTTP/1.1 200 OK\r\n"
+    snprintf(statusResponse, sizeof(statusResponse),
+        "HTTP/1.1 200 OK\r\n"
         "Content-type: application/json\r\n\r\n"
         "%s",
         Relay1.status() ? "on": "off");
@@ -89,13 +91,7 @@ char * parse_request(void *data)
 {
     char * response = NULL;
     // printf("data: %s\n", (char *)data);
-    if (strstr((char *)data, (char *)"/wemo/setup.xml")) {
-        printf("is setup xml: /wemo/setup.xml\n");
-        response = upnp_setup_response();
-    } else if (strstr((char *)data, (char *)"/upnp/control/basicevent1")) {
-        printf("is basicevent1: /upnp/control/basicevent1\n");
-        response = basicevent((char *)data);
-    } else if (strstr((char *)data, (char *)"/on")) {
+    if (strstr((char *)data, (char *)"/on")) {
         Relay1.on();
         response = status();
     } else if (strstr((char *)data, (char *)"/off")) {
@@ -107,6 +103,12 @@ char * parse_request(void *data)
     } else if (strstr((char *)data, (char *)"/status")) {
         printf("Get status\n");
         response = status();
+    } else if (strstr((char *)data, (char *)"/wemo/setup.xml")) {
+        printf("is setup xml: /wemo/setup.xml\n");
+        response = upnp_setup_response();
+    } else if (strstr((char *)data, (char *)"/upnp/control/basicevent1")) {
+        printf("is basicevent1: /upnp/control/basicevent1\n");
+        response = basicevent((char *)data);
     } else {
         printf("unknown route\n");
     }
