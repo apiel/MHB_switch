@@ -8,7 +8,7 @@
 void (*bt_callback)(void);
 void (*bt_callback_short)(void);
 
-unsigned long startTime = 0; 
+unsigned long startTime = 0;
 
 void handleButton(unsigned char pin) {
     int value = gpio_read(pin);

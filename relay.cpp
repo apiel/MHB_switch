@@ -8,6 +8,7 @@ Relay::Relay(int pin, const char * id)
 {
     _id = id;
     _pin = pin;
+    printf("relay initialize, pin %d id %s\n", _pin, _id);
     off();
 }
 
@@ -29,20 +30,22 @@ bool Relay::_can_update()
 void Relay::on()
 {
     if (_status != RELAY_ON && _can_update()) {
-        printf("relay on\n");
         gpio_enable(_pin, GPIO_OUTPUT);
         gpio_write(_pin, RELAY_ON);
         _status = RELAY_ON; // here we should use a setState
+
+        printf("relay on, pin %d value %d id %s\n", _pin, _status, _id);
     }
 }
 
 void Relay::off()
 {
     if (_status != RELAY_OFF && _can_update()) {
-        printf("relay off\n");
         gpio_enable(_pin, GPIO_OUTPUT);
         gpio_write(_pin, RELAY_OFF);
         _status = RELAY_OFF; // here we should use a setState
+
+        printf("relay off, pin %d value %d id %s\n", _pin, _status, _id);
     }
 }
 

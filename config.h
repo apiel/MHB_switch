@@ -27,9 +27,6 @@
 // D7 > GPIO 13
 // D8 > GPIO 15
 
-// #define ACTION_RELAY_ON 1
-// #define ACTION_RELAY_OFF 2
-// #define ACTION_RELAY_TOGGLE 3
 #define RELAY_ON 1
 #define RELAY_OFF 0
 #define RELAY_TOGGLE 2

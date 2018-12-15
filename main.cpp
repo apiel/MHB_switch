@@ -10,12 +10,10 @@
 #include "wifi.h"
 #include "version.h"
 #include "led.h"
-#include "relay.h"
 #include "button.h"
 #include "httpd.h"
 #include "upnp.h"
-
-// need to fix upnp
+#include "relay.h"
 
 static void  main_task(void *pvParameters)
 {
