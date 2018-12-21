@@ -133,23 +133,22 @@ bool upnp_server_init(void)
     return (upcb != NULL);
 }
 
+int getUptime()
+{
+    return xTaskGetTickCount() * portTICK_PERIOD_MS / 1000;
+}
+
 void upnp_task(void *pvParameters)
 {
     bool ok = false;
+    bool end = false;
+
     printf("Upnp task\n\r");
 
-    #ifdef UPNP_TIMEOUT
-    bool end = false;
-    #endif
-
     while (1) {
-        #ifdef UPNP_TIMEOUT
-        int uptime = xTaskGetTickCount() * portTICK_PERIOD_MS / 1000;
-        #endif
-
         if (!ok) ok = upnp_server_init();
         #ifdef UPNP_TIMEOUT
-        else if (!end && uptime > UPNP_TIMEOUT) {
+        else if (!end && getUptime() > UPNP_TIMEOUT) {
             err_t err = igmp_leavegroup(&netif->ip_addr, &ipgroup);
             printf("Leave upnp (err should be 0: %d)\n", err);
             end = true;
