@@ -23,6 +23,9 @@ static const char* get_my_ip(void)
     return (char*) ip;
 }
 
+ip_addr_t ipgroup;
+struct netif* netif;
+
 static struct udp_pcb* mcast_join_group(char *group_ip, uint16_t group_port, void (* recv)(void * arg, struct udp_pcb * upcb, struct pbuf * p, const ip4_addr * addr, short unsigned int port))
 {
     bool status = false;
@@ -36,7 +39,7 @@ static struct udp_pcb* mcast_join_group(char *group_ip, uint16_t group_port, voi
             break;
         }
         udp_bind(upcb, IP_ADDR_ANY, group_port);
-        struct netif* netif = sdk_system_get_netif(STATION_IF);
+        netif = sdk_system_get_netif(STATION_IF);
         if (!netif) {
             printf("Error, netif is null");
             break;
@@ -45,7 +48,6 @@ static struct udp_pcb* mcast_join_group(char *group_ip, uint16_t group_port, voi
             netif->flags |= NETIF_FLAG_IGMP;
             igmp_start(netif);
         }
-        ip_addr_t ipgroup;
         ipaddr_aton(group_ip, &ipgroup);
         err_t err = igmp_joingroup(&netif->ip_addr, &ipgroup);
         if(ERR_OK != err) {
@@ -136,8 +138,23 @@ void upnp_task(void *pvParameters)
     bool ok = false;
     printf("Upnp task\n\r");
 
+    #ifdef UPNP_TIMEOUT
+    bool end = false;
+    #endif
+
     while (1) {
+        #ifdef UPNP_TIMEOUT
+        int uptime = xTaskGetTickCount() * portTICK_PERIOD_MS / 1000;
+        #endif
+
         if (!ok) ok = upnp_server_init();
+        #ifdef UPNP_TIMEOUT
+        else if (!end && uptime > UPNP_TIMEOUT) {
+            err_t err = igmp_leavegroup(&netif->ip_addr, &ipgroup);
+            printf("Leave upnp (err should be 0: %d)\n", err);
+            end = true;
+        }
+        #endif
         vTaskDelay(1000);
     }
 }

@@ -5,6 +5,8 @@
 #define DEVICE_ID "MHB_SWITCH_"
 #define DEVICE_NAME "wemo light"
 
+#define UPNP_TIMEOUT 300 // 5min
+
 #define WEMOS
 #ifdef WEMOS
     #define PIN_BUTTON 0 // D3
