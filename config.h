@@ -3,7 +3,7 @@
 #define __CONFIG_H__
 
 #define DEVICE_ID "MHB_SWITCH_"
-#define DEVICE_NAME "test device"
+#define DEVICE_NAME "wemo light"
 
 #define WEMOS
 #ifdef WEMOS

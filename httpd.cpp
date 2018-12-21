@@ -129,6 +129,8 @@ void httpd_task(void *pvParameters)
     upnp_set_setup_response();
     netconn_bind(nc, IP_ADDR_ANY, HTTPD_PORT);
     netconn_listen(nc);
+    netconn_set_recvtimeout(nc, 2000);
+    netconn_set_sendtimeout(nc, 2000);
     char * response = NULL;
     while (1) {
         err_t err = netconn_accept(nc, &client);

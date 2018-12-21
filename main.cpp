@@ -13,7 +13,7 @@
 #include "button.h"
 #include "httpd.h"
 #include "upnp.h"
-// #include "relay.h"
+#include "relay.h"
 
 static void  main_task(void *pvParameters)
 {
@@ -40,8 +40,8 @@ extern "C" void user_init(void)
 
     wifi_new_connection((char *)WIFI_SSID, (char *)WIFI_PASS);
 
-    // Button button = Button(sdk_system_restart, [](){ Relay1.toggle(); });
-    // button.init();
+    Button button = Button(sdk_system_restart, [](){ Relay1.toggle(); });
+    button.init();
 
     xTaskCreate(&main_task, "main_task", 1024, NULL, 9, NULL);
 }
