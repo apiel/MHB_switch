@@ -118,10 +118,12 @@ char * parse_request(void *data)
 
 #define HTTPD_PORT 80
 
-void httpd_task(void *pvParameters)
+struct netconn *client = NULL;
+struct netconn *nc = NULL;
+
+void httpd_init()
 {
-    struct netconn *client = NULL;
-    struct netconn *nc = netconn_new(NETCONN_TCP);
+    nc = netconn_new(NETCONN_TCP);
     if (nc == NULL) {
         printf("Failed to allocate socket\n");
         vTaskDelete(NULL);
@@ -131,26 +133,36 @@ void httpd_task(void *pvParameters)
     netconn_listen(nc);
     netconn_set_recvtimeout(nc, 2000);
     netconn_set_sendtimeout(nc, 2000);
+}
+
+void httpd_loop()
+{
     char * response = NULL;
-    while (1) {
-        err_t err = netconn_accept(nc, &client);
-        if (err == ERR_OK) {
-            struct netbuf *nb;
-            if ((err = netconn_recv(client, &nb)) == ERR_OK) {
-                void *data = NULL;
-                u16_t len;
-                if (netbuf_data(nb, &data, &len) == ERR_OK) {
-                    // printf("Received data:\n%.*s\n", len, (char*) data);
-                    response = parse_request(data);
-                }
-                if (!response) {
-                    response = (char *)"HTTP/1.1 404 OK\r\nContent-type: text/html\r\n\r\nUnknown route\r\n";
-                }
-                netconn_write(client, response, strlen(response), NETCONN_COPY);
+    err_t err = netconn_accept(nc, &client);
+    if (err == ERR_OK) {
+        struct netbuf *nb;
+        if ((err = netconn_recv(client, &nb)) == ERR_OK) {
+            void *data = NULL;
+            u16_t len;
+            if (netbuf_data(nb, &data, &len) == ERR_OK) {
+                // printf("Received data:\n%.*s\n", len, (char*) data);
+                response = parse_request(data);
             }
-            netbuf_delete(nb);
+            if (!response) {
+                response = (char *)"HTTP/1.1 404 OK\r\nContent-type: text/html\r\n\r\nUnknown route\r\n";
+            }
+            netconn_write(client, response, strlen(response), NETCONN_COPY);
         }
-        netconn_close(client);
-        netconn_delete(client);
+        netbuf_delete(nb);
+    }
+    netconn_close(client);
+    netconn_delete(client);
+}
+
+void httpd_task(void *pvParameters)
+{
+    httpd_init();
+    while (1) {
+        httpd_loop();
     }
 }

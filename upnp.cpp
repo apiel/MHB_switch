@@ -138,22 +138,17 @@ int getUptime()
     return xTaskGetTickCount() * portTICK_PERIOD_MS / 1000;
 }
 
-void upnp_task(void *pvParameters)
+bool ok = false;
+bool end = false;
+
+void upnp()
 {
-    bool ok = false;
-    bool end = false;
-
-    printf("Upnp task\n\r");
-
-    while (1) {
-        if (!ok) ok = upnp_server_init();
-        #ifdef UPNP_TIMEOUT
-        else if (!end && getUptime() > UPNP_TIMEOUT) {
-            err_t err = igmp_leavegroup(&netif->ip_addr, &ipgroup);
-            printf("Leave upnp (err should be 0: %d)\n", err);
-            end = true;
-        }
-        #endif
-        vTaskDelay(1000);
+    if (!ok) ok = upnp_server_init();
+    #ifdef UPNP_TIMEOUT
+    else if (!end && getUptime() > UPNP_TIMEOUT) {
+        err_t err = igmp_leavegroup(&netif->ip_addr, &ipgroup);
+        printf("Leave upnp (err should be 0: %d)\n", err);
+        end = true;
     }
+    #endif
 }
