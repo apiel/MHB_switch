@@ -158,11 +158,3 @@ void httpd_loop()
     netconn_close(client);
     netconn_delete(client);
 }
-
-void httpd_task(void *pvParameters)
-{
-    httpd_init();
-    while (1) {
-        httpd_loop();
-    }
-}

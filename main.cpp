@@ -21,17 +21,11 @@
 static void  main_task(void *pvParameters)
 {
     wifi_wait_connection();
-
-    // xTaskCreate(&httpd_task, "http_server", 1024, NULL, 2, NULL);
     httpd_init();
-
     while(1) { // keep task running else program crash, we could also use xSemaphore
         upnp();
         httpd_loop();
         task_led_blink(2, 10, 20);
-        // taskYIELD();
-        // vTaskDelay(200);
-        // taskYIELD();
         wifi_wait_connection(); // here we could check for wifi connection and reboot if disconnect
     }
 }
