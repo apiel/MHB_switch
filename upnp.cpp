@@ -133,7 +133,7 @@ bool upnp_server_init(void)
     return (upcb != NULL);
 }
 
-int getUptime()
+int getUptimeInSeconds()
 {
     return xTaskGetTickCount() * portTICK_PERIOD_MS / 1000;
 }
@@ -145,7 +145,7 @@ void upnp()
 {
     if (!ok) ok = upnp_server_init();
     #ifdef UPNP_TIMEOUT
-    else if (!end && getUptime() > UPNP_TIMEOUT) {
+    else if (!end && getUptimeInSeconds() > UPNP_TIMEOUT) {
         err_t err = igmp_leavegroup(&netif->ip_addr, &ipgroup);
         printf("Leave upnp (err should be 0: %d)\n", err);
         end = true;

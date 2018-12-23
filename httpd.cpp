@@ -87,6 +87,26 @@ char * status()
     return statusResponse;
 }
 
+char uptimeResponse[128];
+char * getUptime()
+{
+    int sec = xTaskGetTickCount() * portTICK_PERIOD_MS / 1000;
+    int min = sec * 0.01666667;
+    sec -= min * 60;
+    int h = min * 0.01666667;
+    min -= h*60;
+    int day = h * 0.041666667;
+    h -= day * 24;
+
+    snprintf(uptimeResponse, sizeof(uptimeResponse),
+        "HTTP/1.1 200 OK\r\n"
+        "Content-type: application/json\r\n\r\n"
+        "%d day %d hrs %d min %d sec",
+        day, h, min, sec);
+
+    return uptimeResponse;
+}
+
 char * parse_request(void *data)
 {
     char * response = NULL;
@@ -109,6 +129,11 @@ char * parse_request(void *data)
     } else if (strstr((char *)data, (char *)"/upnp/control/basicevent1")) {
         printf("is basicevent1: /upnp/control/basicevent1\n");
         response = basicevent((char *)data);
+    } else if (strstr((char *)data, (char *)"/uptime")) {
+        response = getUptime();
+    } else if (strstr((char *)data, (char *)"/reboot")) {
+        printf("Reboot\n");
+        sdk_system_restart();
     } else {
         printf("unknown route\n");
     }
