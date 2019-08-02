@@ -163,9 +163,11 @@ void httpd_init()
 void httpd_loop()
 {
     char * response = NULL;
+    printf("> httpd\n");
     err_t err = netconn_accept(nc, &client);
     if (err == ERR_OK) {
         struct netbuf *nb;
+        netconn_set_recvtimeout(client, 2000);
         if ((err = netconn_recv(client, &nb)) == ERR_OK) {
             void *data = NULL;
             u16_t len;
@@ -179,7 +181,8 @@ void httpd_loop()
             netconn_write(client, response, strlen(response), NETCONN_COPY);
         }
         netbuf_delete(nb);
+        netconn_close(client);
+    } else {
+        netconn_delete(client);
     }
-    netconn_close(client);
-    netconn_delete(client);
 }

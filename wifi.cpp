@@ -12,6 +12,7 @@
 
 void wifi_wait_connection(void)
 {
+    printf("> wifi\n");
     for(int retry = 20; retry > 0; retry--) {
         if (sdk_wifi_station_get_connect_status() == STATION_GOT_IP) {
             break;

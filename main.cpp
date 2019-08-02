@@ -15,17 +15,16 @@
 #include "upnp.h"
 #include "relay.h"
 
-// we should try to skip all task...
-// need restart from httpd
+// make flash FLASH_SIZE=8 FLASH_MODE=dout
 
 static void  main_task(void *pvParameters)
 {
     wifi_wait_connection();
     httpd_init();
+    // don't put blinking in the loop, this yield the process
     while(1) { // keep task running else program crash, we could also use xSemaphore
         upnp();
         httpd_loop();
-        task_led_blink(2, 10, 20);
         wifi_wait_connection(); // here we could check for wifi connection and reboot if disconnect
     }
 }

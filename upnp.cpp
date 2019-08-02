@@ -151,4 +151,7 @@ void upnp()
         end = true;
     }
     #endif
+    else if (end == false) {
+        printf("> upnp\n");
+    }
 }
