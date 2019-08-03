@@ -156,8 +156,8 @@ void httpd_init()
     upnp_set_setup_response();
     netconn_bind(nc, IP_ADDR_ANY, HTTPD_PORT);
     netconn_listen(nc);
-    netconn_set_recvtimeout(nc, 2000);
-    netconn_set_sendtimeout(nc, 2000);
+    netconn_set_recvtimeout(nc, 1000);
+    netconn_set_sendtimeout(nc, 1000);
 }
 
 void httpd_loop()
@@ -167,7 +167,8 @@ void httpd_loop()
     err_t err = netconn_accept(nc, &client);
     if (err == ERR_OK) {
         struct netbuf *nb;
-        netconn_set_recvtimeout(client, 2000);
+        netconn_set_recvtimeout(client, 1000);
+        netconn_set_sendtimeout(client, 1000);
         if ((err = netconn_recv(client, &nb)) == ERR_OK) {
             void *data = NULL;
             u16_t len;
@@ -176,7 +177,9 @@ void httpd_loop()
                 response = parse_request(data);
             }
             if (!response) {
+                printf("# send response\n");
                 response = (char *)"HTTP/1.1 404 OK\r\nContent-type: text/html\r\n\r\nUnknown route\r\n";
+                printf("# response sent\n");
             }
             netconn_write(client, response, strlen(response), NETCONN_COPY);
         }
