@@ -163,12 +163,12 @@ void httpd_init()
 void httpd_loop()
 {
     char * response = NULL;
+    size_t written = 0;
     printf("> httpd\n");
     err_t err = netconn_accept(nc, &client);
     if (err == ERR_OK) {
         struct netbuf *nb;
         netconn_set_recvtimeout(client, 1000);
-        netconn_set_sendtimeout(client, 1000);
         if ((err = netconn_recv(client, &nb)) == ERR_OK) {
             void *data = NULL;
             u16_t len;
@@ -177,11 +177,13 @@ void httpd_loop()
                 response = parse_request(data);
             }
             if (!response) {
-                printf("# send response\n");
                 response = (char *)"HTTP/1.1 404 OK\r\nContent-type: text/html\r\n\r\nUnknown route\r\n";
-                printf("# response sent\n");
             }
-            netconn_write(client, response, strlen(response), NETCONN_COPY);
+            printf("# send response\n");
+            // err = netconn_write(client, response, strlen(response), NETCONN_COPY);
+            netconn_set_sendtimeout(client, 2000);
+            err = netconn_write_partly(client, response, strlen(response), NETCONN_COPY, &written);
+            printf("# response sent %d %d\n", err, written);
         }
         netbuf_delete(nb);
         netconn_close(client);
