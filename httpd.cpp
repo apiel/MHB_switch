@@ -180,7 +180,7 @@ void httpd_loop()
                 response = (char *)"HTTP/1.1 404 OK\r\nContent-type: text/html\r\n\r\nUnknown route\r\n";
             }
             printf("# send response\n");
-            // err = netconn_write(client, response, strlen(response), NETCONN_COPY);
+            // err = netconn_write(client, response, strlen(response), NETCONN_COPY); // dont use timeout with netconn_write
             netconn_set_sendtimeout(client, 2000);
             err = netconn_write_partly(client, response, strlen(response), NETCONN_COPY, &written);
             printf("# response sent %d %d\n", err, written);
